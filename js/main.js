@@ -7,6 +7,8 @@ canvas.height *= 2
 let width = canvas.width
 let height = canvas.height
 
+let gameover = false
+
 /* OBJECTS */
 var player = {
     position: {
@@ -165,30 +167,39 @@ function drawEnemies() {
 function loop(timestamp) {
     var progress = timestamp - lastRender
 
-    update(progress)
-    draw()
+    if (!gameover) {
+        update(progress)
+        draw()
+    
+        lastRender = timestamp
+        window.requestAnimationFrame(loop)
+    } else {        
+        let endtext = "GAME OVER!"
+        ctx.font = "72px Impact"
+        ctx.fillStyle = "white"
+        ctx.textAlign = "center"
+        ctx.fillText(endtext, width/2, height/2)
+        music.pause()
+    }
 
-    lastRender = timestamp
-    window.requestAnimationFrame(loop)
 }
 
 /* SCREENS */
 function titleScreen() {
-    let startText = "START"
+    let startText = "START YOUR XTRAINING!"
     ctx.font = "72px Impact"
     ctx.fillStyle = "white"
     ctx.textAlign = "center"
     ctx.fillText(startText, width/2, height/2)
     
     // Clicking Start Button
-    window.addEventListener('click', (e) => {
-        const w = width/2
-        const h = height/2
-        if (e.clientX > w && e.clientX < w + 220 && e.clientY > h + 110 && e.clientY < h + 180) {
-            music.play()
-            window.requestAnimationFrame(loop)
-            window.removeEventListener('click', arguments.callee)
-        }
+    canvas.addEventListener('click', function start(e) {
+        window.requestAnimationFrame(loop)
+        canvas.removeEventListener('click', start)
+        music.play()
+        canvas.addEventListener('click', function endgame() {
+            gameover = true
+        })
     })
 
 }
