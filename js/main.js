@@ -8,9 +8,10 @@ let width = canvas.width
 let height = canvas.height
 
 let gameover = false
+let score = 0
 
-/* OBJECTS */
-var player = {
+/* OBJECTS ---------------------------------------------------------------------------------------- */
+let player = {
     position: {
         x: (width / 2),
         y: (height / 2)
@@ -21,110 +22,121 @@ var player = {
         right: false,
         up: false,
         down: false
-    }
+    },
+    size: 10,
+    speed: 5,
+    color: 'white'
 }
 
-var enemy = function() {
-    const voidZone = 0.4 * Math.min(width, height) // prevent enemies from spawning in player start zone, keep this value below 0.5!!!
-    const enemyMinSize = 3 // size of each enemy dot
-    const enemyVarianceSize = 0
-
+let enemy = function() {
     // initial position of enemies
-    this.x = (Math.random() * width)
-    this.y = (Math.random() * height)
-    while (this.x > (width/2) - voidZone && this.x < (width/2) + voidZone && this.y > (height/2) - voidZone && this.y < (height/2) + voidZone) {
-        this.x = (Math.random() * width)
-        this.y = (Math.random() * height)    
-    }
+    let r = ((Math.min(width, height) * 0.6))
+    let theta = Math.random() * (Math.PI * 2)
+    this.x = r * Math.cos(theta) + (canvas.width * 0.5)
+    this.y = r * Math.sin(theta) + (canvas.height * 0.5)
 
     // attributes of enemy
-    this.color = 'hsl(' + 360 * Math.random() + ', 50%, 50%)'
-    this.size = Math.floor(Math.random() * enemyVarianceSize) + enemyMinSize
+    this.color = 360 * Math.random()
+    this.size = 2
 
-    // enemy target each pass across screen
-    let opp = (width/2) - this.x
-    let adj = (height/2) - this.y
-    this.velX = 3 * (opp**2)/(opp**2+adj**2) * (opp/Math.abs(opp))
-    this.velY = 3 * (adj**2)/(opp**2+adj**2) * (adj/Math.abs(adj))
-    
+    // retarget player's position
+    this.acquirePlayerPos = function(offsetx, offsety) {
+        let opp = player.position.x - this.x
+        let adj = player.position.y - this.y
+        let oppadj = (Math.abs(opp)+Math.abs(adj)) 
+        this.velX = Math.abs(opp)/oppadj * (opp/Math.abs(opp)) * (Math.random() * offsetx + 0.75)
+        this.velY = Math.abs(adj)/oppadj * (adj/Math.abs(adj)) * (Math.random() * offsety + 0.75)
+    }
+    this.acquirePlayerPos(0, 0)
 }
 
 const enemyCount = 200
-var enemies = []
+let enemies = []
 
 for (let i = 0; i < enemyCount; i++) {
     enemies.push(new enemy)
 }
 
-/* UPDATE */
+/* UPDATE ---------------------------------------------------------------------------------------- */
 function update(progress) {
-    // var p = progress / 16
-
+    // let p = progress / 16
     updatePlayer()
     updateEnemies()
 }
 
 function updatePlayer() {
 
-    // Player
-    var movementMultiplier = 5;
-
+    // This function block controls the player's character movement and bounds the player character within the game area
     if (player.pressedKeys.up) {
         if (player.position.y > 0) {
-            player.position.y -= movementMultiplier
+            player.position.y -= player.speed
         }         
     }    
     if (player.pressedKeys.down) {
         if (player.position.y < height) {
-            player.position.y += movementMultiplier
+            player.position.y += player.speed
         }        
     }
     if (player.pressedKeys.left) {
         if (player.position.x > 0) {
-            player.position.x -= movementMultiplier
+            player.position.x -= player.speed
         }
-        player.rotation -= movementMultiplier
+        player.rotation -= player.speed
     }    
     if (player.pressedKeys.right) {
         if (player.position.x < width) {
-            player.position.x += movementMultiplier
+            player.position.x += player.speed
         }
-        player.rotation += movementMultiplier
+        player.rotation += player.speed
     }
 }
 
 function updateEnemies() {
-    const velocity = 3;
+    // This function controls the direction and velocity of each enemy as they reach the border of a screen.
+    const velocitymultiplier = 3
+    const offsetMultiplier = 0.5
 
     for (const e in enemies) {
-        enemies[e].x += enemies[e].velX
-        enemies[e].y += enemies[e].velY
+        let offsetx = 0
+        let offsety = 0
 
-        if (enemies[e].x > width) {
-            enemies[e].x = 0
-            newTarget(enemies[e])
-        } else if (enemies[e].x < 0) {
-            enemies[e].x = width
-            newTarget(enemies[e])
-        } else if (enemies[e].y > height) {
-            enemies[e].y = 0
-            newTarget(enemies[e])
-        } else if (enemies[e].y < 0) {
-            enemies[e].y = height
-            newTarget(enemies[e])
+        enemies[e].x += enemies[e].velX * velocitymultiplier
+        enemies[e].y += enemies[e].velY * velocitymultiplier
+
+        // collision with border check
+        if (enemies[e].x < 0 || enemies[e].x > width || enemies[e].y < 0 || enemies[e].y > height) {
+            if (enemies[e].x < 0) {
+                enemies[e].x = width
+                offsety = offsetMultiplier
+            } else if (enemies[e].x > width) {
+                enemies[e].x = 0
+                offsety = offsetMultiplier
+            }
+            if (enemies[e].y < 0) {
+                enemies[e].y = height
+                offsetx = offsetMultiplier
+            } else if (enemies[e].y > height) {
+                enemies[e].y = 0
+                offsetx = offsetMultiplier
+            }
+
+            enemies[e].acquirePlayerPos(offsetx, offsety)
+            offsetx = 0
+            offsety = 0
+        }    
+        
+        // collision with player
+        if ((Math.abs(player.position.x - enemies[e].x) < player.size) && (Math.abs(player.position.y - enemies[e].y) < player.size)) {
+            player.color = "hsl(" + enemies[e].color + ", " + ((Math.random() * 50) + 50) + "%, 50%)"
         }
     }
-
-    function newTarget(e) {
-        let opp = player.position.x - e.x
-        let adj = player.position.y - e.y
-        e.velX = (opp**2)/(opp**2+adj**2) * (opp/Math.abs(opp)) * (Math.random()*1.5 + velocity)
-        e.velY = (adj**2)/(opp**2+adj**2) * (adj/Math.abs(adj)) * (Math.random()*1.5 + velocity)
-    }
+}
+/* COLLISION ---------------------------------------------------------------------------------- */
+function collisionCheck() {
 
 }
 
-/* DRAW */
+/* DRAW ---------------------------------------------------------------------------------------- */
 function draw() {
     ctx.clearRect(0, 0, width, height)
 
@@ -134,20 +146,17 @@ function draw() {
 }
 
 function drawPlayer() {
-    const scale = 5
-
     ctx.save()
     ctx.translate(player.position.x, player.position.y)
     ctx.rotate((Math.PI / 180) * player.rotation)
-    ctx.strokeStyle = 'white'
-    ctx.lineWidth = 10
+    ctx.strokeStyle = player.color
 
     ctx.beginPath()
-    ctx.moveTo(-scale, -scale)
-    ctx.lineTo(scale, -scale)
-    ctx.lineTo(scale, scale)
-    ctx.lineTo(-scale, scale)
-    ctx.lineTo(-scale, -scale)
+    ctx.moveTo(-player.size, -player.size)
+    ctx.lineTo(player.size, -player.size)
+    ctx.lineTo(player.size, player.size)
+    ctx.lineTo(-player.size, player.size)
+    ctx.lineTo(-player.size, -player.size)
     ctx.closePath()
     ctx.stroke()
     ctx.restore()
@@ -155,17 +164,19 @@ function drawPlayer() {
 
 function drawEnemies() {
     for (const e in enemies) {
+        ctx.save()
         ctx.beginPath();
         ctx.arc(enemies[e].x, enemies[e].y, enemies[e].size, 0, 2 * Math.PI, false);
-        ctx.fillStyle = enemies[e].color
+        ctx.fillStyle = "hsl(" + enemies[e].color + ", 100%, 50%)"
         ctx.fill();
         ctx.closePath();
+        ctx.restore()
     }
 }
 
 /* LOOP */
 function loop(timestamp) {
-    var progress = timestamp - lastRender
+    let progress = timestamp - lastRender
 
     if (!gameover) {
         update(progress)
@@ -173,12 +184,15 @@ function loop(timestamp) {
     
         lastRender = timestamp
         window.requestAnimationFrame(loop)
-    } else {        
-        let endtext = "GAME OVER!"
-        ctx.font = "72px Impact"
+    } else {
+        score = (Date.now() - score) / 1000
+        let endtext = "GAME OVER! "
+        ctx.font = "60px Impact"
         ctx.fillStyle = "white"
         ctx.textAlign = "center"
         ctx.fillText(endtext, width/2, height/2)
+        ctx.font = "72px Impact"
+        ctx.fillText(score.toFixed(2) + "s", width/2, height/2 + 100)
         music.pause()
     }
 
@@ -186,7 +200,7 @@ function loop(timestamp) {
 
 /* SCREENS */
 function titleScreen() {
-    let startText = "START YOUR XTRAINING!"
+    let startText = "PLAY"
     ctx.font = "72px Impact"
     ctx.fillStyle = "white"
     ctx.textAlign = "center"
@@ -197,31 +211,33 @@ function titleScreen() {
         window.requestAnimationFrame(loop)
         canvas.removeEventListener('click', start)
         music.play()
+        score = Date.now()
+        // temporary game ender
         canvas.addEventListener('click', function endgame() {
             gameover = true
+
         })
     })
 
 }
 
 /* MAIN CALL TO LOOP */
-var lastRender = 0
-
+let lastRender = 0
 titleScreen()
 
 /* USER INPUT HANDLING EVENTS */
-var keyMap = {
-    68: 'right',
-    65: 'left',
-    87: 'up',
-    83: 'down'
+let keyMap = {
+    68: 'right',    39: 'right',
+    65: 'left',     37: 'left',
+    87: 'up',       38: 'up',
+    83: 'down',     40: 'down'
 }
 function keydown(event) {
-    var key = keyMap[event.keyCode]
+    let key = keyMap[event.keyCode]
     player.pressedKeys[key] = true
 }
 function keyup(event) {
-    var key = keyMap[event.keyCode]
+    let key = keyMap[event.keyCode]
     player.pressedKeys[key] = false
 }
 
