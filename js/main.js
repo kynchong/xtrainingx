@@ -1,15 +1,19 @@
 const canvas = document.getElementById("canvas")
 const ctx = canvas.getContext("2d")
 
-// Load external resources
-const music = new Audio("audio/bg-music.mp3")
-const death = new Audio("audio/death-explosion.mp3")
-
+// Window sizing
 canvas.width *= 2
 canvas.height *= 2
 let width = canvas.width
 let height = canvas.height
 let lastRender = 0
+
+// Load external resources
+const music = new Audio("audio/bg-music.mp3")
+music.load()
+const death = new Audio("audio/death-explosion.mp3")
+const titleImage = new Image()
+titleImage.src = 'imgs/xtrainer.png'
 
 /* USER INPUT HANDLING EVENTS ---------------------------------------------------------------------------------------- */
 let keyMap = {
@@ -50,8 +54,8 @@ class player {
         this.speed = 5
         this.color = {
             hue: 360,
-            saturation: 0,
-            lightness: 100
+            saturation: 100,
+            lightness: 50
         }
         this.entitySides = 4 // shape of player entity
         
@@ -183,9 +187,11 @@ function updateEnemies() {
             // the sound of death
             death.currentTime = 0
             death.play()
+
         }
     }
 }
+
 
 /* DRAW ---------------------------------------------------------------------------------------- */
 function drawPlayer() {
@@ -193,7 +199,7 @@ function drawPlayer() {
     ctx.translate(p1.position.x, p1.position.y)
     ctx.rotate((Math.PI / 180) * p1.rotation)
     ctx.strokeStyle = "hsl(" + p1.color.hue + "," + p1.color.saturation + "%," + p1.color.lightness + "%)"
-    ctx.lineWidth = 2
+    ctx.lineWidth = 3
 
     ctx.beginPath()
     ctx.moveTo(-p1.size, -p1.size)
@@ -211,24 +217,27 @@ function drawPlayerDeath() {
 
     ctx.save()
 
-    // position of player
+    // inertia of dead player box
     p1.position.x += -p1.heading.left + p1.heading.right
     p1.position.y += -p1.heading.up + p1.heading.down
     ctx.translate(p1.position.x, p1.position.y)
-    ctx.rotate((Math.PI / 180) * p1.rotation)
-    ctx.strokeStyle = "hsl(" + p1.color.hue + "," + p1.color.saturation + "%," + p1.color.lightness-- + "%)"
-    
+
+    // asploding limbs
     p1.size++
-    // draw the path of the shape
     ctx.beginPath()
+    ctx.lineWidth = (Math.random() * 5)
 
     for (let angle = 0; angle < sides; angle++) {
         if (angle % 2 == 0) {
-            ctx.moveTo(p1.size * Math.sin( angle * 1.9 * Math.PI / sides), p1.size * Math.cos(angle * 2 * Math.PI / sides) )
+            ctx.moveTo(p1.size * Math.sin( angle * 2 * Math.PI / sides), p1.size * Math.cos(angle * 2 * Math.PI / sides) )
         } else {
-            ctx.lineTo(p1.size * Math.sin( angle * 2.1 * Math.PI / sides), p1.size * Math.cos(angle * 2 * Math.PI / sides) )            
+            ctx.lineTo(p1.size * Math.sin( angle * 2 * Math.PI / sides), p1.size * Math.cos(angle * 2 * Math.PI / sides) )            
         }
     }
+
+    // fade out
+    p1.color.lightness *= p1.color.lightness > 0 ? 0.991 : 0
+    ctx.strokeStyle = "hsl(" + p1.color.hue + "," + p1.color.saturation + "%," + p1.color.lightness + "%)"
     
     ctx.closePath()
     ctx.stroke()
@@ -247,6 +256,20 @@ function drawEnemies() {
     }
 }
 
+function drawEnemiesPlayerDead() {
+
+    for (const e in enemies) {
+        ctx.save()
+        ctx.beginPath();
+        enemies[e].size += Math.random() * 0.05
+        ctx.arc(enemies[e].x, enemies[e].y, Math.abs(Math.sin(enemies[e].size)) * 5, 0, 2 * Math.PI, false);
+        ctx.fillStyle = "hsl(" + enemies[e].color + ", 50%, 50%)"
+        ctx.fill();
+        ctx.closePath();
+        ctx.restore()
+    }
+}
+
 /* LOOP ---------------------------------------------------------------------------------------- */
 function loop(timestamp) {
 
@@ -256,14 +279,22 @@ function loop(timestamp) {
     if (p1.alive) {
         updatePlayer()
         drawPlayer()
+
+        // enemy
+        updateEnemies()
+        drawEnemies()
+
     } else {
         drawPlayerDeath()
+        
+        // enemy
+        updateEnemies()
+        drawEnemiesPlayerDead()
+
         scoreScreen()
     }
 
-    // enemy
-    updateEnemies()    
-    drawEnemies()
+
 
     // animation logic
     lastRender = timestamp
@@ -276,34 +307,36 @@ function titleScreen() {
     ctx.textAlign = "center"
     ctx.fillStyle = "white"
     ctx.strokeStyle = "white"
-    ctx.lineWidth = 10
+    ctx.lineWidth = 5
 
     // Title
-    ctx.font = "130px RacingSansOne"
-    ctx.fillText("X-TRAINING X", width / 2, height / 3)
+    ctx.font = "9rem RacingSansOne"
+    ctx.fillText("X-TRAINING X", width / 2, height / 4)
+    ctx.drawImage(titleImage, width * (1/3), height * (1/3), width * (1/3), height * (1/3))
 
-    // Play Button
-    ctx.font = "72px RacingSansOne"
-    ctx.fillText("PLAY", width / 2, height / 2)
 
+    // ENTER to start
+    ctx.font = "2.5rem RacingSansOne"
+    ctx.fillText("Press ENTER to start.", width / 2, height * (4/5))
+
+    // Instructions
     ctx.beginPath()
-    ctx.rect(width/2 - 100, height/2 - 60, 200, 75)
-    
+    ctx.font = "1.25rem Courier"
+    ctx.fillText('"WASD" or ←↑↓→ keys to move.', width / 2, height - (height * 0.1))
+
     ctx.stroke()
     ctx.closePath()
     ctx.restore()
 
     // Clicking Play Button
-    canvas.addEventListener('click', startgame)
+    window.addEventListener('keydown', startgame)
 }
 
-function startgame(e) {
-    const bound = canvas.getBoundingClientRect()
-    let clickX = e.clientX - bound.left
-    let clickY = e.clientY - bound.top
-
-    if (clickX > width/2 - 100 && clickX < width/2 + 100 && clickY > height/2 - 65 && clickY < height/2 + 20) {
-        canvas.removeEventListener('click', startgame)
+function startgame(event) {
+    if (event.code == 'Enter') {
+        window.removeEventListener('keydown', startgame)
+        window.addEventListener('keydown', restartgame)
+        music.load()
         music.play()
         p1.score = Date.now()
         window.requestAnimationFrame(loop)
@@ -318,45 +351,32 @@ function scoreScreen() {
     ctx.lineWidth = 10
 
     // Game Over message
-    ctx.font = "60px RacingSansOne"
-    ctx.fillText("GAME OVER!", width / 2, height / 2 - 100)
+    ctx.font = "6rem RacingSansOne"
+    ctx.fillText("GAME OVER!", width / 2, height / 3)
 
     // Formatting Player Score
     let formattedScore = null
-    ctx.font = "100px RacingSansOne"    
+    ctx.font = "8rem Courier"
     if (p1.score < 60) {
-        formattedScore = new Date(p1.score * 1000).toISOString().substring(17,22) + " s"
+        formattedScore = new Date(p1.score * 1000).toISOString().substring(17,22) + "s"
     } else {
         formattedScore = new Date(p1.score * 1000).toISOString().substring(14,22)
     }    
     ctx.fillText(formattedScore, width / 2, height / 2)
 
     // Restart Button
-    ctx.font = "60px RacingSansOne"
-    ctx.fillText("RESTART", width / 2, height / 2 + 100)
-    ctx.beginPath()
-    ctx.rect(width/2 - 160, height/2 + 40, 320, 80)
-    ctx.stroke()
-    ctx.closePath()
-    ctx.restore()
-    
+    ctx.font = "2.5rem RacingSansOne"
+    ctx.fillText("Press ENTER to Try Again!", width / 2, height * (3 / 4) )
 
-    // Clicking Try Again
-    canvas.addEventListener('click', restartgame)
+    ctx.restore()
 }
 
-function restartgame(e) {
-    const bound = canvas.getBoundingClientRect()
-    let clickX = e.clientX - bound.left
-    let clickY = e.clientY - bound.top
-
-    if (clickX > width/2 - 165 && clickX < width/2 + 165 && clickY > height/2 + 30 && clickY < height/2 + 130) {
-        console.log(clickX, clickY)
-        canvas.removeEventListener('click', restartgame)
+function restartgame(event) {
+    if (!p1.alive && event.code == 'Enter') {
         music.play()
         p1.reset()
         p1.score = Date.now()
-    
+        
         for (const e in enemies) {
             enemies[e].reset()
         }
@@ -372,6 +392,5 @@ death.volume = 0.3
 let f = new FontFace("RacingSansOne", "url(./fonts/RacingSansOne-Regular.ttf)");
 f.load().then((font) => {
     document.fonts.add(font);
-    console.log(font)
     titleScreen() // Launch Game
   });
