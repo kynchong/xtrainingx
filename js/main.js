@@ -310,18 +310,18 @@ function titleScreen() {
     ctx.lineWidth = 5
 
     // Title
-    ctx.font = "9rem RacingSansOne"
+    ctx.font = width*(1/10) + "px RacingSansOne"
     ctx.fillText("X-TRAINING X", width / 2, height / 4)
     ctx.drawImage(titleImage, width * (1/3), height * (1/3), width * (1/3), height * (1/3))
 
 
     // ENTER to start
-    ctx.font = "2.5rem RacingSansOne"
+    ctx.font = width*(1/20) + "px RacingSansOne"
     ctx.fillText("Press ENTER to start.", width / 2, height * (4/5))
 
     // Instructions
     ctx.beginPath()
-    ctx.font = "1.25rem Courier"
+    ctx.font = width*(1/30) + "px Courier"
     ctx.fillText('"WASD" or ←↑↓→ keys to move.', width / 2, height - (height * 0.1))
 
     ctx.stroke()
@@ -351,12 +351,12 @@ function scoreScreen() {
     ctx.lineWidth = 10
 
     // Game Over message
-    ctx.font = "6rem RacingSansOne"
+    ctx.font = width*(1/20) + "px RacingSansOne"
     ctx.fillText("GAME OVER!", width / 2, height / 3)
 
     // Formatting Player Score
     let formattedScore = null
-    ctx.font = "8rem Courier"
+    ctx.font = width*(1/10) + "px Courier"
     if (p1.score < 60) {
         formattedScore = new Date(p1.score * 1000).toISOString().substring(17,22) + "s"
     } else {
@@ -365,7 +365,7 @@ function scoreScreen() {
     ctx.fillText(formattedScore, width / 2, height / 2)
 
     // Restart Button
-    ctx.font = "2.5rem RacingSansOne"
+    ctx.font = width*(1/30) + "px RacingSansOne"
     ctx.fillText("Press ENTER to Try Again!", width / 2, height * (3 / 4) )
 
     ctx.restore()
