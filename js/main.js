@@ -1,5 +1,7 @@
 const canvas = document.getElementById("canvas")
 const ctx = canvas.getContext("2d")
+
+// Load external resources
 const music = new Audio("audio/bg-music.mp3")
 const death = new Audio("audio/death-explosion.mp3")
 
@@ -18,6 +20,9 @@ let keyMap = {
 }
 function keydown(event) {
     let key = keyMap[event.keyCode]
+    if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(event.code) > -1) {
+        event.preventDefault();
+    }
     p1.pressedKeys[key] = true
 }
 function keyup(event) {
@@ -283,10 +288,10 @@ function titleScreen() {
 
     ctx.beginPath()
     ctx.rect(width/2 - 100, height/2 - 60, 200, 75)
+    
     ctx.stroke()
     ctx.closePath()
-
-    ctx.restore()    
+    ctx.restore()
 
     // Clicking Play Button
     canvas.addEventListener('click', startgame)
@@ -359,11 +364,13 @@ function restartgame(e) {
 }
 
 /* MAIN CALL TO LOOP ---------------------------------------------------------------------------------------- */
+// Settings
+music.volume = 0.5
 
 // Preloading FontFace
 let f = new FontFace("RacingSansOne", "url(./fonts/RacingSansOne-Regular.ttf)");
 f.load().then((font) => {
     document.fonts.add(font);
     console.log(font)
-    titleScreen()
+    titleScreen() // Launch Game
   });
