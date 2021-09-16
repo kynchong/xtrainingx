@@ -351,7 +351,7 @@ function scoreScreen() {
     ctx.lineWidth = 10
 
     // Game Over message
-    ctx.font = width*(1/20) + "px RacingSansOne"
+    ctx.font = width*(1/10) + "px RacingSansOne"
     ctx.fillText("GAME OVER!", width / 2, height / 3)
 
     // Formatting Player Score
@@ -385,8 +385,8 @@ function restartgame(event) {
 
 /* MAIN CALL TO LOOP ---------------------------------------------------------------------------------------- */
 // Settings
-music.volume = 0.2
-death.volume = 0.3
+music.volume = 0.1
+death.volume = 0.2
 
 // Preloading FontFace
 let f = new FontFace("RacingSansOne", "url(./fonts/RacingSansOne-Regular.ttf)");
