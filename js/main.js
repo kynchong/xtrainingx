@@ -365,7 +365,8 @@ function restartgame(e) {
 
 /* MAIN CALL TO LOOP ---------------------------------------------------------------------------------------- */
 // Settings
-music.volume = 0.5
+music.volume = 0.2
+death.volume = 0.3
 
 // Preloading FontFace
 let f = new FontFace("RacingSansOne", "url(./fonts/RacingSansOne-Regular.ttf)");
