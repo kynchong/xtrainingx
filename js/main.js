@@ -10,10 +10,13 @@ let lastRender = 0
 
 // Load external resources
 const music = new Audio("audio/bg-music.mp3")
-music.load()
 const death = new Audio("audio/death-explosion.mp3")
 const titleImage = new Image()
 titleImage.src = 'imgs/xtrainer.png'
+titleImage.addEventListener('load', function() {
+    console.log("Title image loaded.")
+})
+
 
 /* USER INPUT HANDLING EVENTS ---------------------------------------------------------------------------------------- */
 let keyMap = {
@@ -58,7 +61,6 @@ class player {
             lightness: 50
         }
         this.entitySides = 4 // shape of player entity
-        
         this.pressedKeys = {
             left: false,
             right: false,
@@ -158,7 +160,7 @@ function updateEnemies() {
         enemies[e].y += enemies[e].velY * velocitymultiplier
 
         // collision with border check
-        if (enemies[e].x < 0 || enemies[e].x > width || enemies[e].y < 0 || enemies[e].y > height) {
+        if (enemies[e].x < 0 - enemies[e].size/2 || enemies[e].x > width + enemies[e].size/2 || enemies[e].y < 0 - enemies[e].size/2 || enemies[e].y > height + enemies[e].size/2) {
             if (enemies[e].x < 0) {
                 enemies[e].x = width
                 offsety = varianceFactor
@@ -166,7 +168,7 @@ function updateEnemies() {
                 enemies[e].x = 0
                 offsety = varianceFactor
             }
-            if (enemies[e].y < 0) {
+            if (enemies[e].y < 0 - enemies[e].size/2) {
                 enemies[e].y = height
                 offsetx = varianceFactor
             } else if (enemies[e].y > height) {
@@ -185,7 +187,6 @@ function updateEnemies() {
             p1.alive = false
 
             // the sound of death
-            death.currentTime = 0
             death.play()
 
         }
@@ -218,20 +219,18 @@ function drawPlayerDeath() {
     ctx.save()
 
     // inertia of dead player box
-    p1.position.x += -p1.heading.left + p1.heading.right
-    p1.position.y += -p1.heading.up + p1.heading.down
+    p1.position.x += (-p1.heading.left + p1.heading.right)
+    p1.position.y += (-p1.heading.up + p1.heading.down)
     ctx.translate(p1.position.x, p1.position.y)
 
     // asploding limbs
     p1.size++
-    ctx.beginPath()
-    ctx.lineWidth = (Math.random() * 5)
 
     for (let angle = 0; angle < sides; angle++) {
         if (angle % 2 == 0) {
-            ctx.moveTo(p1.size * Math.sin( angle * 2 * Math.PI / sides), p1.size * Math.cos(angle * 2 * Math.PI / sides) )
+            ctx.moveTo(0.5 * p1.size * Math.sin( angle * 2 * Math.PI / sides), p1.size * Math.cos(angle * 2 * Math.PI / sides) )
         } else {
-            ctx.lineTo(p1.size * Math.sin( angle * 2 * Math.PI / sides), p1.size * Math.cos(angle * 2 * Math.PI / sides) )            
+            ctx.lineTo(p1.size * Math.sin( angle * 2 * Math.PI / sides), p1.size * Math.cos(angle * 2 * Math.PI / sides) )
         }
     }
 
@@ -239,7 +238,6 @@ function drawPlayerDeath() {
     p1.color.lightness *= p1.color.lightness > 0 ? 0.991 : 0
     ctx.strokeStyle = "hsl(" + p1.color.hue + "," + p1.color.saturation + "%," + p1.color.lightness + "%)"
     
-    ctx.closePath()
     ctx.stroke()
     ctx.restore()
 }
@@ -310,7 +308,7 @@ function titleScreen() {
     ctx.lineWidth = 5
 
     // Title
-    ctx.font = "9rem RacingSansOne"
+    ctx.font = "7rem RacingSansOne"
     ctx.fillText("X-TRAINING X", width / 2, height / 4)
     ctx.drawImage(titleImage, width * (1/3), height * (1/3), width * (1/3), height * (1/3))
 

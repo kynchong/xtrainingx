@@ -15,57 +15,36 @@ body {
     align-content: center;
     align-items: center;
 
-
     color: #fff;
     font-family: 'Courier New', Courier, monospace;
     font-size: 1em;
 
-    background: #0F2027;  /* fallback for old browsers */
-    background: -webkit-linear-gradient(to bottom, #2C5364, #203A43, #0F2027);  /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to bottom, #2C5364, #203A43, #0F2027); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    background: rgb(32, 0, 0);
 }
-
-#canvas-container {
-    flex-shrink: 0;
-    height: 1000px;
-    width: 1000px;
-    margin: 1rem;
-}
-
 #canvas {
     background: #000;
-    width: 100%;
-    height: 100%;
+    width: calc(100vmin);
+    height: calc(100vmin);
+    max-width: 1000px;
+    max-height: 1000px;
+    margin-bottom: 2rem;
+    border-radius: 5px;
+    box-shadow: inset 0 0 2px 0px darkred, 0 0 100px 0px rgb(64, 0, 0);
 
-    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
 
 #information-section {
     text-align: center;
     box-sizing: border-box;
-    width: 1000px;
-    margin: 2em;
-    padding: 2em;
-    color: #aaa;
-    border: 3px groove #2C5364;
+    max-width: 1000px;
 
-}
+    background-color: #000;
+    box-shadow: inset 0 0 2px 0px darkred, 0 0 100px 0px rgb(64, 0, 0);
 
-h1 {
-    font-family: "RacingSansOne", Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-    font-size: 3em;
-    color: #fff;
-    text-shadow: 0px 3px 0px #b2a98f,
-    0px 14px 10px rgba(0,0,0,0.15),
-    0px 24px 2px rgba(0,0,0,0.1),
-    0px 24px 30px rgba(0,0,0,0.1);
 }
 
 h3 {
-    color: #2C5364;
+    color: darkred;
 }
 
 #git-link a {
@@ -73,7 +52,7 @@ h3 {
 }
 
 #git-link svg {
-    padding-top: 2rem;
-    stroke: #203A43;
+    padding: 1rem;
+    stroke: red;
 }
 
