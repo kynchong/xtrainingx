@@ -366,7 +366,7 @@ function titleScreen() {
 
 function startgame(event) {
     setTimeout(function() {
-        if (event.code == 'Enter' || event.changedTouches[0].identifier == 0) {
+        if (event.code == 'Enter' || event.touches[0] >= 0) {
             window.removeEventListener('keydown', startgame)
             window.removeEventListener('touchstart', startgame)
             let playPromise = music.play()
@@ -383,6 +383,7 @@ function startgame(event) {
     
     }, 400) // time delay to assist with play() user interaction
 }
+
 
 function scoreScreen() {
     ctx.save()
