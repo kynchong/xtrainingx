@@ -1,11 +1,20 @@
 const canvas = document.getElementById("canvas")
 const ctx = canvas.getContext("2d")
 
-// Window sizing
-canvas.width *= 2
-canvas.height *= 2
+/* WINDOW SIZE & RESIZE ---------------------------------------------------------------------------------------- */
+const upscale = 2
+canvas.width = canvas.getBoundingClientRect().width * upscale
+canvas.height = canvas.getBoundingClientRect().height * upscale
 let width = canvas.width
 let height = canvas.height
+screen.orientation.lock("portrait")
+
+window.onresize = function() {
+    canvas.width = canvas.getBoundingClientRect().width * upscale
+    canvas.height = canvas.getBoundingClientRect().height * upscale
+    width = canvas.width
+    height = canvas.height
+}
 let lastRender = 0
 
 // Load external resources
@@ -17,7 +26,6 @@ titleImage.addEventListener('load', function() {
     console.log("Title image loaded.")
 })
 
-
 /* USER INPUT HANDLING EVENTS ---------------------------------------------------------------------------------------- */
 let keyMap = {
     68: 'right', 39: 'right',
@@ -28,7 +36,7 @@ let keyMap = {
 function keydown(event) {
     let key = keyMap[event.keyCode]
     if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(event.code) > -1) {
-        event.preventDefault();
+        event.preventDefault()
     }
     p1.pressedKeys[key] = true
 }
@@ -40,6 +48,23 @@ function keyup(event) {
 window.addEventListener("keydown", keydown, false)
 window.addEventListener("keyup", keyup, false)
 
+/* Touch */
+window.addEventListener('touchstart', function(event) {
+    p1.target.x = event.changedTouches[0].clientX
+    p1.target.y = event.changedTouches[0].clientY
+}, false)
+
+window.addEventListener('touchmove', function(event) {
+    p1.target.x = event.changedTouches[0].clientX
+    p1.target.y = event.changedTouches[0].clientY
+}, false)
+
+window.addEventListener('touchend', function(event) {
+    p1.target.x = p1.position.x
+    p1.target.y = p1.position.y
+}, false)
+
+
 /* OBJECTS ---------------------------------------------------------------------------------------- */
 class player {
     constructor() {
@@ -49,6 +74,10 @@ class player {
     // init & reset
     reset() {
         this.position = {
+            x: width / 2,
+            y: height / 2
+        }
+        this.target = {
             x: width / 2,
             y: height / 2
         }
@@ -104,6 +133,7 @@ class enemy {
         this.y
         this.velX
         this.velY
+        this.velocitymultiplier = 3
         this.initPosition()
         this.acquirePlayerPos(0, 0)
     }
@@ -111,7 +141,7 @@ class enemy {
 
 /* INSTANTIATE GAME OBJECTS */
 const p1 = new player
-const enemyCount = 200
+let enemyCount = 200
 let enemies = []
 
 for (let i = 0; i < enemyCount; i++) {
@@ -120,6 +150,12 @@ for (let i = 0; i < enemyCount; i++) {
 
 /* UPDATE ---------------------------------------------------------------------------------------- */
 function updatePlayer() {
+
+    // Touch movement
+    if (p1.position.x != p1.target.x && p1.position.y != p1.target.y) {
+        p1.position.x += (p1.target.x - p1.position.x) / 80
+        p1.position.y += (p1.target.y - p1.position.y) / 80
+    }
 
     // This function block controls the p1's character movement and bounds the p1 character within the game area
     if (p1.pressedKeys.up) {
@@ -149,15 +185,15 @@ function updatePlayer() {
 
 function updateEnemies() {
     // This function controls the direction and velocity of each enemy as they reach the border of a screen.
-    const velocitymultiplier = 3
+
     const varianceFactor = 2
 
     for (const e in enemies) {
         let offsetx = 0
         let offsety = 0
 
-        enemies[e].x += enemies[e].velX * velocitymultiplier
-        enemies[e].y += enemies[e].velY * velocitymultiplier
+        enemies[e].x += enemies[e].velX * enemies[e].velocitymultiplier
+        enemies[e].y += enemies[e].velY * enemies[e].velocitymultiplier
 
         // collision with border check
         if (enemies[e].x < 0 - enemies[e].size/2 || enemies[e].x > width + enemies[e].size/2 || enemies[e].y < 0 - enemies[e].size/2 || enemies[e].y > height + enemies[e].size/2) {
@@ -187,8 +223,8 @@ function updateEnemies() {
             p1.alive = false
 
             // the sound of death
+            death.currentTime = 0
             death.play()
-
         }
     }
 }
@@ -292,8 +328,6 @@ function loop(timestamp) {
         scoreScreen()
     }
 
-
-
     // animation logic
     lastRender = timestamp
     window.requestAnimationFrame(loop)
@@ -312,10 +346,9 @@ function titleScreen() {
     ctx.fillText("X-TRAINING X", width / 2, height / 4)
     ctx.drawImage(titleImage, width * (1/3), height * (1/3), width * (1/3), height * (1/3))
 
-
     // ENTER to start
     ctx.font = width*(1/20) + "px RacingSansOne"
-    ctx.fillText("Press ENTER to start.", width / 2, height * (4/5))
+    ctx.fillText("Press ENTER or TOUCH to start.", width / 2, height * (4/5))
 
     // Instructions
     ctx.beginPath()
@@ -328,17 +361,28 @@ function titleScreen() {
 
     // Clicking Play Button
     window.addEventListener('keydown', startgame)
+    //window.addEventListener('touchstart', startgame)
+    window.addEventListener('touchstart', startgame)
 }
 
 function startgame(event) {
-    if (event.code == 'Enter') {
-        window.removeEventListener('keydown', startgame)
-        window.addEventListener('keydown', restartgame)
-        music.load()
-        music.play()
-        p1.score = Date.now()
-        window.requestAnimationFrame(loop)
-    }
+    setTimeout(function() {
+        if (event.code == 'Enter' || event.changedTouches[0].identifier == 0) {
+            window.removeEventListener('keydown', startgame)
+            window.removeEventListener('touchstart', startgame)
+            let playPromise = music.play()
+            if (playPromise !== undefined) {
+                playPromise.then(function() {
+                    console.log("Playing music!")
+                }).catch(function(err) {
+                    console.log(err)
+                })
+            }
+            p1.score = Date.now()
+            window.requestAnimationFrame(loop)
+        }
+    
+    }, 400) // time delay to assist with play() user interaction
 }
 
 function scoreScreen() {
@@ -367,14 +411,19 @@ function scoreScreen() {
     ctx.fillText("Press ENTER to Try Again!", width / 2, height * (3 / 4) )
 
     ctx.restore()
+
+    // listen for player choice to restart
+    window.addEventListener('keydown', restartgame)
+    window.addEventListener('touchstart', restartgame)
 }
 
 function restartgame(event) {
-    if (!p1.alive && event.code == 'Enter') {
-        music.play()
+    if (!p1.alive && (event.code == 'Enter' || event.changedTouches[0].identifier == 0)) {
+        window.removeEventListener('keydown', restartgame)
+        window.removeEventListener('touchstart', restartgame)
         p1.reset()
         p1.score = Date.now()
-        
+        music.play()
         for (const e in enemies) {
             enemies[e].reset()
         }
@@ -383,8 +432,8 @@ function restartgame(event) {
 
 /* MAIN CALL TO LOOP ---------------------------------------------------------------------------------------- */
 // Settings
-music.volume = 0.1
-death.volume = 0.2
+music.volume = 0.2
+death.volume = 0.3
 
 // Preloading FontFace
 let f = new FontFace("RacingSansOne", "url(./fonts/RacingSansOne-Regular.ttf)");

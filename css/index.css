@@ -15,6 +15,8 @@ body {
     align-content: center;
     align-items: center;
 
+    margin: 5rem;
+
     color: #fff;
     font-family: 'Courier New', Courier, monospace;
     font-size: 1em;
@@ -23,8 +25,8 @@ body {
 }
 #canvas {
     background: #000;
-    width: calc(100vmin);
-    height: calc(100vmin);
+    width: 100vw;
+    height: 100vh;
     max-width: 1000px;
     max-height: 1000px;
     margin-bottom: 2rem;
@@ -36,6 +38,8 @@ body {
 #information-section {
     text-align: center;
     box-sizing: border-box;
+    margin: 5em;
+    width: 100vw;
     max-width: 1000px;
 
     background-color: #000;
@@ -56,3 +60,19 @@ h3 {
     stroke: red;
 }
 
+/* Mobile */
+@media screen and (max-width: 767px) and (orientation: portrait), screen and (max-height: 767px) and (orientation: landscape) {
+    body {
+        margin: 0;
+
+        overflow: hidden;
+    }
+
+    #canvas {
+        margin: 0;
+    }
+
+    #information-section {
+        display:none;
+    }
+}
