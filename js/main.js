@@ -425,7 +425,7 @@ function scoreScreen() {
 }
 
 function restartgame(event) {
-    if (!p1.alive && (event.code == 'Enter' || event.changedTouches[0].identifier == 0)) {
+    if (!p1.alive && (event.code == 'Enter' || event.touches[0] != undefined)) {
         window.removeEventListener('keydown', restartgame)
         window.removeEventListener('touchstart', restartgame)
         p1.reset()
