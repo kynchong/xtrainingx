@@ -49,16 +49,21 @@ window.addEventListener("keyup", keyup, false)
 
 /* Touch */
 window.addEventListener('touchstart', function(event) {
-    p1.target.x = event.changedTouches[0].clientX
-    p1.target.y = event.changedTouches[0].clientY
-}, false)
+    event.preventDefault()
+    p1.isTouching = true
+    p1.target.x = event.touches[0].clientX * 2
+    p1.target.y = event.touches[0].clientY * 2
+}, {passive: false})
 
 window.addEventListener('touchmove', function(event) {
-    p1.target.x = event.changedTouches[0].clientX
-    p1.target.y = event.changedTouches[0].clientY
-}, false)
+    event.preventDefault()
+    p1.isTouching = true
+    p1.target.x = event.touches[0].clientX * 2
+    p1.target.y = event.touches[0].clientY * 2
+}, {passive: false})
 
 window.addEventListener('touchend', function(event) {
+    p1.isTouching = false
     p1.target.x = p1.position.x
     p1.target.y = p1.position.y
 }, false)
@@ -96,6 +101,7 @@ class player {
             down: false
         }
         this.heading = this.pressedKeys // stores last used keys
+        this.isTouching = false
 
         this.score = null
         this.alive = true 
@@ -132,7 +138,7 @@ class enemy {
         this.y
         this.velX
         this.velY
-        this.velocitymultiplier = 3
+        this.velocitymultiplier = 4
         this.initPosition()
         this.acquirePlayerPos(0, 0)
     }
@@ -140,7 +146,7 @@ class enemy {
 
 /* INSTANTIATE GAME OBJECTS */
 const p1 = new player
-let enemyCount = 200
+let enemyCount = 100
 let enemies = []
 
 for (let i = 0; i < enemyCount; i++) {
@@ -151,9 +157,10 @@ for (let i = 0; i < enemyCount; i++) {
 function updatePlayer() {
 
     // Touch movement
-    if (p1.position.x != p1.target.x && p1.position.y != p1.target.y) {
-        p1.position.x += (p1.target.x - p1.position.x) / 80
-        p1.position.y += (p1.target.y - p1.position.y) / 80
+    
+    if (p1.isTouching && (Math.abs(p1.position.x - p1.target.x) > 12 || Math.abs(p1.position.y != p1.target.y) > 12)) {
+        p1.position.x += (p1.target.x - p1.position.x) / 50
+        p1.position.y += (p1.target.y - p1.position.y) / 50
     }
 
     // This function block controls the p1's character movement and bounds the p1 character within the game area
@@ -365,10 +372,10 @@ function titleScreen() {
 }
 
 function startgame(event) {
+    window.removeEventListener('keydown', startgame)
+    window.removeEventListener('touchstart', startgame)
     setTimeout(function() {
-        if (event.code == 'Enter' || event.touches[0] >= 0) {
-            window.removeEventListener('keydown', startgame)
-            window.removeEventListener('touchstart', startgame)
+        if (event.code == 'Enter' || event.touches[0] != undefined) {
             let playPromise = music.play()
             if (playPromise !== undefined) {
                 playPromise.then(function() {
