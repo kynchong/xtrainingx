@@ -7,7 +7,6 @@ canvas.width = canvas.getBoundingClientRect().width * upscale
 canvas.height = canvas.getBoundingClientRect().height * upscale
 let width = canvas.width
 let height = canvas.height
-screen.orientation.lock("portrait")
 
 window.onresize = function() {
     canvas.width = canvas.getBoundingClientRect().width * upscale
