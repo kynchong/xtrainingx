@@ -90,7 +90,7 @@ class player {
         this.rotation = 0
         this.size = 10
         this.speed = 4
-        this.speedDampener = 0.01
+        this.speedDampener = 0.05
         this.deadZoneThreshold = 10
         this.color = {
             hue: 360,
