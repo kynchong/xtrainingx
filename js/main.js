@@ -53,6 +53,9 @@ window.addEventListener('touchstart', function (event) {
     event.preventDefault()
     p1.touchStart.x = event.touches[0].clientX * 2
     p1.touchStart.y = event.touches[0].clientY * 2
+    p1.target.x = event.touches[0].clientX * 2
+    p1.target.y = event.touches[0].clientY * 2
+
 }, {
     passive: false
 })
@@ -91,7 +94,7 @@ class player {
         this.size = 10
         this.speed = 4
         this.speedDampener = 0.05
-        this.deadZoneThreshold = 15
+        this.deadZoneThreshold = 25
         this.color = {
             hue: 360,
             saturation: 100,
