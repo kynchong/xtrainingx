@@ -377,7 +377,7 @@ function scoreScreen() {
     ctx.strokeStyle = "white"
     ctx.lineWidth = 10
     // Game Over message
-    ctx.font = width * (1 / 6) + "px RacingSansOne"
+    ctx.font = width * (1 / 7) + "px RacingSansOne"
     ctx.fillText("GAME OVER!", width * (1 / 2), height * (1 / 4))
     // Formatting Player Score
     let formattedScore = null
@@ -389,8 +389,8 @@ function scoreScreen() {
     }
     ctx.fillText(formattedScore, width * (1 / 2), height * (1 / 2))
     // Restart Button
-    ctx.font = width * (1 / 20) + "px RacingSansOne"
-    ctx.fillText("Press ENTER or TAP SCREEN to Try Again!", width * (1 / 2), height * (3 / 4))
+    ctx.font = width * (1 / 25) + "px RacingSansOne"
+    ctx.fillText("Press ENTER or DOUBLE TAP to Try Again!", width * (1 / 2), height * (3 / 4))
     ctx.restore()
     // listen for player choice to restart
     window.addEventListener('keydown', restartgame)
@@ -398,7 +398,31 @@ function scoreScreen() {
 }
 
 function restartgame(event) {
-    if (!p1.alive && (event.code == 'Enter' || event.touches[0] != undefined)) {
+    // logic to detect the first touch and to reset if no additional touch detected within timeframe
+    const msBetweenTap = 500
+    var firstTap = true
+    setTimeout(() => {
+        firstTap = false
+    }, msBetweenTap)
+
+    // touch event start
+    window.addEventListener('touchstart', function() {
+        if (!p1.alive && event.touches[0] != undefined && firstTap) {
+            window.removeEventListener('keydown', restartgame)
+            window.removeEventListener('touchstart', restartgame)
+            p1.reset()
+            p1.score = Date.now()
+            music.play()
+            for (const e in enemies) {
+                enemies[e].reset()
+            }
+
+            this.removeEventListener('touchstart', arguments.callee)
+        }
+    })
+
+    // if keyboard event
+    if (!p1.alive && (event.code == 'Enter')) {
         window.removeEventListener('keydown', restartgame)
         window.removeEventListener('touchstart', restartgame)
         p1.reset()
@@ -408,14 +432,19 @@ function restartgame(event) {
             enemies[e].reset()
         }
     }
+
 }
 /* MAIN CALL TO LOOP ---------------------------------------------------------------------------------------- */
 // Settings
 music.volume = 0.2
 death.volume = 0.3
-// Preloading FontFace
-let f = new FontFace("RacingSansOne", "url(./fonts/RacingSansOne-Regular.ttf)")
-f.load().then((font) => {
-    document.fonts.add(font)
-    titleScreen() // Launch Game
-})
+
+// Preloading
+window.onload = function() {
+    // Font
+    let f = new FontFace("RacingSansOne", "url(./fonts/RacingSansOne-Regular.ttf)")
+    f.load().then((font) => {
+        document.fonts.add(font)
+        titleScreen() // Launch Game
+    })
+}
