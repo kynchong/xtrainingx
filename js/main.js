@@ -12,9 +12,8 @@ window.onresize = function () {
     height = canvas.height
 }()
 
-let lastRender = 0
 // Load external resources
-const music = new Audio("audio/bg-music.mp3")
+const music = new Audio("audio/bg-music-night-crawler.mp3")
 const death = new Audio("audio/death-explosion.mp3")
 const titleImage = new Image()
 titleImage.src = 'imgs/xtrainer.png'
@@ -305,7 +304,7 @@ function drawEnemiesPlayerDead() {
     }
 }
 /* LOOP ---------------------------------------------------------------------------------------- */
-function loop(timestamp) {
+function loop() {
     ctx.clearRect(0, 0, width, height)
     // player
     if (p1.alive) {
@@ -321,8 +320,7 @@ function loop(timestamp) {
         drawEnemiesPlayerDead()
         scoreScreen()
     }
-    // animation logic
-    lastRender = timestamp
+
     window.requestAnimationFrame(loop)
 }
 /* SCREENS ---------------------------------------------------------------------------------------- */
