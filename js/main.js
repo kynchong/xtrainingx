@@ -461,7 +461,7 @@ death.volume = 0.3
 window.onload = function() {
     // Font
     const f = new FontFace("VCR", "url(./fonts/VCR_OSD_MONO_1.001.ttf)")
-    const f2 = new FontFace("ARCADE", "url(./fonts/ARCADE.ttf")
+    const f2 = new FontFace("ARCADE", "url(./fonts/ARCADE.TTF")
 
     f.load().then((font) => {
         document.fonts.add(font)
