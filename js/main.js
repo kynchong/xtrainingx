@@ -15,6 +15,13 @@ window.onresize = function () {
 // Load external resources
 const music = new Audio("audio/bg-music-night-crawler.mp3")
 const death = new Audio("audio/death-explosion.mp3")
+
+
+
+death.addEventListener('load', function(e) {
+    console.log('Audio loaded: ', e)
+})
+
 const titleImage = new Image()
 titleImage.src = 'imgs/xtrainer.png'
 titleImage.addEventListener('load', function () {
@@ -331,15 +338,21 @@ function titleScreen() {
     ctx.strokeStyle = "white"
     ctx.line = 5
     // Title
-    ctx.font = width * (1 / 8) + "px RacingSansOne"
-    ctx.fillText("X-TRAINING X", width * (1 / 2), height * (1 / 4))
+    ctx.font = width * 2 + "px VCR"
+    ctx.fillStyle = "rgb(48,0,0)"
+    ctx.fillText("X", width * (1 / 2), height * (6/7))
+    ctx.fillStyle = "white"
+
+    ctx.font = width * (1 / 6) + "px ARCADE"
+    ctx.fillText("X-TRAINING", width * (1 / 2), height * (1 / 3))
+
     ctx.drawImage(titleImage, width * (1 / 3), (height * (1 / 2)) - (width * (1 / 6)), width * (1 / 3), width * (1 / 3))
     // ENTER to start
-    ctx.font = width * (1 / 20) + "px RacingSansOne"
-    ctx.fillText("Press ENTER or TAP SCREEN to start.", width * (1 / 2), height * (3 / 4))
+    ctx.font = width * (1 / 25) + "px VCR"
+    ctx.fillText("Press ENTER or TAP SCREEN to play.", width * (1 / 2), height * (3 / 4))
     // Instructions
     ctx.beginPath()
-    ctx.font = width * (1 / 30) + "px Courier"
+    ctx.font = width * (1 / 30) + "px VCR"
     ctx.fillText('"WASD" or ←↑↓→ keys to move.', width * (1 / 2), height * (4 / 5))
     ctx.stroke()
     ctx.closePath()
@@ -354,6 +367,7 @@ function startgame(event) {
     window.removeEventListener('touchstart', startgame)
     setTimeout(function () {
         if (event.code == 'Enter' || event.touches[0] != undefined) {
+            // load audio
             let playPromise = music.play()
             if (playPromise !== undefined) {
                 playPromise.then(function () {
@@ -362,7 +376,12 @@ function startgame(event) {
                     console.log(err)
                 })
             }
+            death.load()
+
+            // prep player score count
             p1.score = Date.now()
+
+            // begin game loop
             window.requestAnimationFrame(loop)
         }
     }, 400) // time delay to assist with play() user interaction
@@ -375,11 +394,12 @@ function scoreScreen() {
     ctx.strokeStyle = "white"
     ctx.lineWidth = 10
     // Game Over message
-    ctx.font = width * (1 / 7) + "px RacingSansOne"
-    ctx.fillText("GAME OVER!", width * (1 / 2), height * (1 / 4))
+    ctx.font = width * (1 / 3) + "px ARCADE"
+    ctx.fillText("GAME", width * (1 / 2), height * (1 / 4) - 100)
+    ctx.fillText("OVER", width * (1 / 2), height * (1 / 4) + 100)
     // Formatting Player Score
     let formattedScore = null
-    ctx.font = width * (1 / 5) + "px Courier"
+    ctx.font = width * (1 / 5) + "px VCR"
     if (p1.score < 60) {
         formattedScore = new Date(p1.score * 1000).toISOString().substring(17, 22) + "s"
     } else {
@@ -387,7 +407,7 @@ function scoreScreen() {
     }
     ctx.fillText(formattedScore, width * (1 / 2), height * (1 / 2))
     // Restart Button
-    ctx.font = width * (1 / 25) + "px RacingSansOne"
+    ctx.font = width * (1 / 25) + "px VCR"
     ctx.fillText("Press ENTER or DOUBLE TAP to Try Again!", width * (1 / 2), height * (3 / 4))
     ctx.restore()
     // listen for player choice to restart
@@ -440,9 +460,15 @@ death.volume = 0.3
 // Preloading
 window.onload = function() {
     // Font
-    let f = new FontFace("RacingSansOne", "url(./fonts/RacingSansOne-Regular.ttf)")
+    const f = new FontFace("VCR", "url(./fonts/VCR_OSD_MONO_1.001.ttf)")
+    const f2 = new FontFace("ARCADE", "url(./fonts/ARCADE.ttf")
+
     f.load().then((font) => {
         document.fonts.add(font)
-        titleScreen() // Launch Game
+
+        f2.load().then((font2) => {
+            document.fonts.add(font2)
+            titleScreen() // Launch Game
+        })
     })
 }
