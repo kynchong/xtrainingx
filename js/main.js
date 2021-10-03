@@ -98,7 +98,7 @@ class player {
         }
         this.rotation = 0
         this.size = 10
-        this.speed = 4
+        this.speed = 5
         this.speedDampener = 0.05
         this.deadZoneThreshold = 25
         this.color = {
@@ -123,10 +123,11 @@ class enemy {
     constructor() {
         this.reset()
     }
-    // initialize position
+    // draws the initial position of enemy. 
     initPosition() {
-        let r = ((Math.min(width, height) * 0.6))
-        let theta = Math.random() * (Math.PI * 2)
+        const distanceToEdge = 1.0 // 0% to 100% from center. 100% is all the way to edge.
+        let theta = Math.random() * (Math.PI * 2) // start with a random direction
+        let r = (Math.min(width, height) * distanceToEdge) // choose a distance from center
         this.x = r * Math.cos(theta) + (width * 0.5)
         this.y = r * Math.sin(theta) + (height * 0.5)
     }
@@ -141,7 +142,7 @@ class enemy {
     // init & reset
     reset() {
         this.color = 360 * Math.random()
-        this.size = 2
+        this.size = 3
         this.x
         this.y
         this.velX
