@@ -240,6 +240,7 @@ function updateEnemies() {
             p1.score = (Date.now() - p1.score) / 1000
             p1.alive = false
             // the sound of death
+            death.load()
             death.currentTime = 0
             death.play()
         }
@@ -376,7 +377,6 @@ function startgame(event) {
                     console.log(err)
                 })
             }
-            death.load()
 
             // prep player score count
             p1.score = Date.now()
