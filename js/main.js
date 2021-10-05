@@ -340,9 +340,9 @@ function titleScreen() {
     ctx.strokeStyle = "white"
     ctx.line = 5
     // Title
-    ctx.font = width * 2 + "px VCR"
+    ctx.font = Math.max(width, height) * 1.25 + "px VCR"
     ctx.fillStyle = "rgb(48,0,0)"
-    ctx.fillText("X", width * (1 / 2), height * (6/7))
+    ctx.fillText("X", width * (1 / 2), height)
     ctx.fillStyle = "white"
 
     ctx.font = width * (1 / 6) + "px ARCADE"
@@ -395,9 +395,9 @@ function scoreScreen() {
     ctx.strokeStyle = "white"
     ctx.lineWidth = 10
     // Game Over message
-    ctx.font = width * (1 / 3) + "px ARCADE"
-    ctx.fillText("GAME", width * (1 / 2), height * (1 / 4) - 100)
-    ctx.fillText("OVER", width * (1 / 2), height * (1 / 4) + 100)
+    ctx.font = width * (1 / 4) + "px ARCADE"
+    ctx.fillText("GAME", width * (1 / 2), height * (2 / 9) + (50 * height/width))
+    ctx.fillText("OVER", width * (1 / 2), height * (4 / 9) - (50 * height/width))
     // Formatting Player Score
     let formattedScore = null
     ctx.font = width * (1 / 5) + "px VCR"
@@ -406,7 +406,7 @@ function scoreScreen() {
     } else {
         formattedScore = new Date(p1.score * 1000).toISOString().substring(14, 22)
     }
-    ctx.fillText(formattedScore, width * (1 / 2), height * (1 / 2))
+    ctx.fillText(formattedScore, width * (1 / 2), height * (7 / 11))
     // Restart Button
     ctx.font = width * (1 / 25) + "px VCR"
     ctx.fillText("Press ENTER or DOUBLE TAP to Try Again!", width * (1 / 2), height * (3 / 4))
