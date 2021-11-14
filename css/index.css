@@ -10,12 +10,12 @@ html, body {
 
 @font-face {
     font-family: "VCR";
-    src: url(../fonts/VCR_OSD_MONO_1.001.TTF);
+    src: url(../fonts/VCR.TTF);
 }
 
 @font-face {
     font-family: "Commando";
-    src: url(../fonts/commando.ttf);
+    src: url(../fonts/COMMANDO.TTF);
 }
 
 #canvas {
