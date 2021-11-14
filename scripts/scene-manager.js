@@ -65,7 +65,7 @@ function SceneManager(canvas) {
     const music = new THREE.Audio(listener);
     const musicLoader = new THREE.AudioLoader();
     musicLoader.load(
-        'audio/bg-music-night-crawler.ogg',
+        'audio/bg-music-night-crawler.mp3',
         function (audioBuffer) {
             music.setBuffer(audioBuffer);
             music.setLoop(true);
@@ -79,7 +79,7 @@ function SceneManager(canvas) {
     const deathsfx = new THREE.Audio(listener);
     const deathsfxLoader = new THREE.AudioLoader();
     deathsfxLoader.load(
-        'audio/death.ogg',
+        'audio/death.mp3',
         function (audioBuffer) {
             deathsfx.setBuffer(audioBuffer);
             deathsfx.setLoop(false);
