@@ -1,81 +1,109 @@
-html {
+html, body {
     margin: 0;
     padding: 0;
 }
 
 @font-face {
-    font-family: "RacingSansOne";
-    src: url(../fonts/RacingSansOne-Regular.ttf);
+    font-family: "Arcade";
+    src: url(../fonts/ARCADE.TTF);
 }
 
-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-content: center;
-    align-items: center;
-
-    margin: 5rem;
-
-    color: #fff;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 1em;
-
-    background: rgb(32, 0, 0);
+@font-face {
+    font-family: "VCR";
+    src: url(../fonts/VCR_OSD_MONO_1.001.TTF);
 }
+
+@font-face {
+    font-family: "Commando";
+    src: url(../fonts/commando.ttf);
+}
+
 #canvas {
-    background: #000;
-    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
     height: 100vh;
-    max-width: 1000px;
-    max-height: 1000px;
-    margin-bottom: 2rem;
-    border-radius: 5px;
-    box-shadow: inset 0 0 2px 0px darkred, 0 0 100px 0px rgb(64, 0, 0);
-    box-sizing: content-box;
-
 }
 
-#information-section {
+button {
+    transition: 0.5s ease-in-out;
+    position: fixed;
+    width: max-content;
+    top: 80%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    padding: 4% 1% 0% 4%;
+    line-height: calc(5vmin + 4vmax);
+
+    font-family: 'Arcade', sans-serif;
+    font-size: calc(10vmin + 4vmax);
     text-align: center;
-    box-sizing: content-box;
-    margin: 5em;
-    width: 100vw;
-    max-width: 1000px;
+    color: white;
+    text-shadow: 0px 5px 0 darkgray;
 
-    background-color: #000;
-    box-shadow: inset 0 0 2px 0px darkred, 0 0 100px 0px rgb(64, 0, 0);
-
+    background: darkred;
+    border: 5px solid white;
+    border-radius: 15px;
+    box-shadow: 0 5px gray, 0 10px 10px rgba(0,0,0,0.25), inset 0 5px rgba(0,0,0,0.25);
 }
 
-h3 {
-    color: darkred;
+.top-text {
+    transition: 0.5s ease-in-out;
+    width: 100%;
+
+    position: fixed;
+    top: 15%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    font-family: 'Commando', sans-serif;
+    font-size: calc(5vmin + 5vmax);
+    text-align: center;
+    color: #fff;
+    text-shadow: 0px 0px 0 rgb(242,242,242),
+                 0px 1px 0 rgb(229,229,229),
+                 0px 2px 0 rgb(217,217,217),
+                 0px 3px 0 rgb(204,204,204),
+                 0px 4px 0 rgb(191,191,191),
+                 0px 5px 0 rgb(178,178,178),
+                 0px 6px 0 rgb(165,165,165),
+                 0px 7px 0 rgb(153,153,153),
+                 0px 8px 0 rgb(140,140,140),
+                 0px 9px 0 rgb(127,127,127),
+                 0px 10px  0 rgb(114,114,114),
+                 0px 11px 10px rgba(0,0,0,0.6),
+                 0px 11px 1px rgba(0,0,0,0.5),
+                 0px 0px 10px rgba(0,0,0,.2);
 }
 
-#git-link a {
-    text-decoration: none;
+
+/* BEGIN */
+#title-screen {
+    position: fixed;
+    z-index: 999;
+
+    transition: 1s ease-out;
 }
 
-#git-link svg {
-    padding: 1rem;
-    stroke: red;
+
+/* END */
+#end-screen {
+    display: none;
+    position: fixed;
+    z-index: 1000;
 }
 
-/* Mobile */
-@media screen and (max-width: 767px) and (orientation: portrait), screen and (max-height: 767px) and (orientation: landscape) {
-    body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-    }
 
-    #canvas {
-        margin: 0;
-        padding: 0;
-        border-radius: 0;
-    }
-
-    #information-section {
-        display:none;
-    }
+#game-stats {
+    transition: opacity 0.5s;
+    opacity: 0;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    color: white;
+    font-family: 'VCR', sans-serif;
+    font-size: 5rem;
 }
