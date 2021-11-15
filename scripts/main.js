@@ -3,7 +3,8 @@ const canvas = document.getElementById("canvas");
 const sceneManager = new SceneManager(canvas);
 
 // MOBILE DEVICE CHECK
-const isMobile = navigator.userAgentData.mobile;
+const hasTouchPoints = navigator.maxTouchPoints > 0 ? true : false;
+
 
 /* ------------------------------------------------ HTML ------------------------------------------------ */
 // END SCREEN
@@ -41,7 +42,7 @@ playBtnHTML.id = "play-btn";
 playBtnHTML.innerText = "PLAY";
 titleScreenHTML.append(playBtnHTML);
 
-if (!isMobile) {
+if (!hasTouchPoints) {
     const warnHTML = document.createElement("div");
     warnHTML.id = 'warn-text';
     warnHTML.innerText = "Designed for mobile smart devices. Desktop experience may differ.";
