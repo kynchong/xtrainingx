@@ -40,12 +40,6 @@ function Player(scene) {
 
     this.hitBox = () => hitBox;
 
-    // debug
-    let minX = 0;
-    let minY = 0;
-    let maxX = 0;
-    let maxY = 0;
-
     this.handleInput = (movement, camera) => {
         const minDistance = Math.min(window.innerWidth, window.innerHeight) / 6;
         const xMove = Math.abs(movement.x) / minDistance < 1 ? movement.x / minDistance : movement.x / Math.abs(movement.x);
@@ -63,6 +57,21 @@ function Player(scene) {
         // Y-axis movement
         if (cube.position.y - y > camera.position.y + camera.bottom && cube.position.y - y < camera.position.y + camera.top) {
             cube.position.y -= y;
+        }
+    }
+
+    this.handleKeyInput = function (keyMap, camera) {
+        if ((keyMap[65] || keyMap[37]) && (cube.position.x > camera.left)) {
+            cube.position.x -= 5;
+        }
+        if ((keyMap[68] || keyMap[39]) && (cube.position.x < camera.right)) {
+            cube.position.x += 5;
+        }
+        if ((keyMap[83] || keyMap[40]) && (cube.position.y > camera.position.y + camera.bottom)) {
+            cube.position.y -= 5;
+        }
+        if ((keyMap[87] || keyMap[38]) && (cube.position.y < camera.position.y + camera.top)) {
+            cube.position.y += 5;
         }
     }
 
@@ -150,26 +159,3 @@ function Player(scene) {
     }
 
 }
-
-/* TEMPORARY GRAVEYARD */
-
-/*
-    this.handleInput = function (keyMap, camera) {
-        if (keyMap[65] && (cube.position.x > camera.left)) {
-            cube.rotation.y -= 0.1;
-            cube.position.x -= 3;
-        }
-        if (keyMap[68] && (cube.position.x < camera.right)) {
-            cube.rotation.y += 0.1;
-            cube.position.x += 3;
-        }
-        if (keyMap[83] && (cube.position.y > camera.position.y + camera.bottom)) {
-            cube.rotation.x -= 0.1;
-            cube.position.y -= 3;
-        }
-        if (keyMap[87] && (cube.position.y < camera.position.y + camera.top)) {
-            cube.rotation.x += 0.1;
-            cube.position.y += 3;
-        }
-    }
-*/

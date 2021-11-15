@@ -2,42 +2,54 @@
 const canvas = document.getElementById("canvas");
 const sceneManager = new SceneManager(canvas);
 
-/* ------------------------------------------------- UI ------------------------------------------------- */
+// MOBILE DEVICE CHECK
+const isMobile = navigator.userAgentData.mobile;
+
+/* ------------------------------------------------ HTML ------------------------------------------------ */
 // END SCREEN
-const endScreenEl = document.createElement("div");
-endScreenEl.id = "end-screen";
+const endScreenHTML = document.createElement("div");
+endScreenHTML.id = "end-screen";
 
-const gameOverEl = document.createElement("span");
-gameOverEl.id = "game-over-text";
-gameOverEl.className = "top-text";
-gameOverEl.innerText = "GAME OVER!";
-endScreenEl.append(gameOverEl);
+const gameOverHTML = document.createElement("span");
+gameOverHTML.id = "game-over-text";
+gameOverHTML.className = "top-text";
+gameOverHTML.innerText = "GAME OVER!";
+endScreenHTML.append(gameOverHTML);
 
-const gameStatsEl = document.createElement("span");
-gameStatsEl.id = "game-stats";
-endScreenEl.append(gameStatsEl);
+const gameStatsHTML = document.createElement("span");
+gameStatsHTML.id = "game-stats";
+endScreenHTML.append(gameStatsHTML);
 
-const playAgainBtnEl = document.createElement("button");
-playAgainBtnEl.id = "play-again-btn";
-playAgainBtnEl.innerText = "PLAY";
-endScreenEl.append(playAgainBtnEl);
-document.body.prepend(endScreenEl);
+const playAgainBtnHTML = document.createElement("button");
+playAgainBtnHTML.id = "play-again-btn";
+playAgainBtnHTML.innerText = "PLAY";
+endScreenHTML.append(playAgainBtnHTML);
+document.body.prepend(endScreenHTML);
 
 // TITLE SCREEN
-const titleScreenEl = document.createElement("div");
-titleScreenEl.id = "title-screen";
+const titleScreenHTML = document.createElement("div");
+titleScreenHTML.id = "title-screen";
 
-const titleEl = document.createElement("span");
-titleEl.id = "title-text-content";
-titleEl.className = "top-text";
-titleEl.innerText = "X-TRAINING X";
-titleScreenEl.append(titleEl);
+const titleHTML = document.createElement("span");
+titleHTML.id = "title-text-content";
+titleHTML.className = "top-text";
+titleHTML.innerText = "X-TRAINING X";
+titleScreenHTML.append(titleHTML);
 
-const playBtnEl = document.createElement("button");
-playBtnEl.id = "play-btn";
-playBtnEl.innerText = "PLAY";
-titleScreenEl.append(playBtnEl);
-document.body.prepend(titleScreenEl);
+const playBtnHTML = document.createElement("button");
+playBtnHTML.id = "play-btn";
+playBtnHTML.innerText = "PLAY";
+titleScreenHTML.append(playBtnHTML);
+
+if (!isMobile) {
+    const warnHTML = document.createElement("div");
+    warnHTML.id = 'warn-text';
+    warnHTML.innerText = "Designed for mobile smart devices. Desktop experience may differ.";
+    titleScreenHTML.append(warnHTML);
+};
+
+document.body.prepend(titleScreenHTML);
+
 /* ----------------------------------------------- RESIZE ----------------------------------------------- */
 window.addEventListener('resize', () => {
     canvas.width = window.innerWidth;
@@ -72,30 +84,36 @@ function handleTouchEnd(event) {
     sceneManager.handleInput(touchStart, touchMove);
 }
 
+// KEYBOARD INPUT
+function handleKeyDown(event) {
+    let keyCode = event.which;
+    sceneManager.handleKeyInput(keyCode, true);
+}
+
+function handleKeyUp(event) {
+    let keyCode = event.which;
+    sceneManager.handleKeyInput(keyCode, false);
+}
+
 /* -------------------------------------------- GAME STATES --------------------------------------------- */
 function gameLoad() {
     // connect with scene manager
     sceneManager.gameLoad();
 
-    // title screen ui elements
-    const titleScreenElement = document.getElementById('title-screen');
-    const titleElement = document.getElementById('title-text-content');
-    const playBtn = document.getElementById('play-btn');
-
     // play button clicked
-    playBtn.addEventListener('click', () => {
-        playBtn.disabled = true;
+    playBtnHTML.addEventListener('click', () => {
+        playBtnHTML.disabled = true;
 
         // play/stop for safari audio restrictions
         sceneManager.iOSAudioInit();
 
         // transition texts out of title screen
-        titleElement.style.transform = "translate(-50%, -50vh)";
-        playBtn.style.transform = "translate(-50%, 150vh)";
+        titleHTML.style.transform = "translate(-50%, -50vh)";
+        playBtnHTML.style.transform = "translate(-50%, 150vh)";
 
         // timeout for css animation to complete before stepping into next state in game
         setTimeout(() => {
-            titleScreenElement.style.display = 'none';
+            titleScreenHTML.style.display = 'none';
             sceneManager.gameState = sceneManager.STATES.RUNNING;
         }, 1000);
     });
@@ -115,6 +133,10 @@ function gameRunning() {
     window.addEventListener('touchstart', handleTouchStart, { passive: false });
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
     window.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+    // keyboard input
+    window.onkeydown = handleKeyDown;
+    window.onkeyup = handleKeyUp;
 }
 
 function gameOver() {
@@ -127,51 +149,46 @@ function gameOver() {
     sceneManager.gameOver();
 
     // display end-screen information
-    const endScreenElement = document.getElementById('end-screen');
-    const gameOverElement = document.getElementById('game-over-text');
-    const gameStatsElement = document.getElementById('game-stats');
-    const playAgainBtn = document.getElementById('play-again-btn');
-
-    endScreenElement.style.display = "block";
+    endScreenHTML.style.display = "block";
     setTimeout(() => {
-        gameOverElement.style.transform = "translate(-50%, -50%)";
-        gameStatsElement.style.opacity = "1.0";
-        playAgainBtn.style.transform = "translate(-50%, -50%)";
+        gameOverHTML.style.transform = "translate(-50%, -50%)";
+        gameStatsHTML.style.opacity = "1.0";
+        playAgainBtnHTML.style.transform = "translate(-50%, -50%)";
     }, 50);
 
     // handle play again button
-    playAgainBtn.addEventListener('click', function playAgain(event) {
+    playAgainBtnHTML.addEventListener('click', function playAgain(event) {
         event.preventDefault();
 
         // successful double tap
-        if (playAgainBtn.style.background == "red") {
+        if (playAgainBtnHTML.style.background == "red") {
             // block excessive clicks
-            playAgainBtn.disabled = true;
-            playAgainBtn.removeEventListener('click', arguments.callee);
+            playAgainBtnHTML.disabled = true;
+            playAgainBtnHTML.removeEventListener('click', arguments.callee);
 
             // animate out ui elements
-            gameOverElement.style.transform = "translate(-50%, -150vh)";
-            gameStatsElement.style.opacity = "0.0";
-            playAgainBtn.style.transform = "translate(-50%, 150vh)";
+            gameOverHTML.style.transform = "translate(-50%, -150vh)";
+            gameStatsHTML.style.opacity = "0.0";
+            playAgainBtnHTML.style.transform = "translate(-50%, 150vh)";
 
             // restore button text
-            playAgainBtn.style.background = "darkred";
+            playAgainBtnHTML.style.background = "darkred";
 
             // hide end screen
             setTimeout(() => {
-                endScreenElement.style.display = "none";
-                playAgainBtn.disabled = false;
+                endScreenHTML.style.display = "none";
+                playAgainBtnHTML.disabled = false;
             }, 500);
 
             // set next gamestate
             sceneManager.gameState = sceneManager.STATES.RUNNING;
         } else {
             // single tap
-            playAgainBtn.style.background = "red";
+            playAgainBtnHTML.style.background = "red";
 
             // back to zero taps if time elapses
             setTimeout(() => {
-                playAgainBtn.style.background = "darkred";
+                playAgainBtnHTML.style.background = "darkred";
             }, 1000);
         }
     }, { passive: false });
@@ -204,28 +221,4 @@ function render() {
 
 window.addEventListener('DOMContentLoaded', () => {
     render();
-  });
-
-/* TEMPORARY GRAVEYARD */
-
-/*
-// handle DOM events
-bindEventListeners();
-
-// BINDINGS
-function bindEventListeners() {
-    window.onkeydown = handleKeyDown;
-    window.onkeyup = handleKeyUp;
-}
-
-// INPUT
-function handleKeyDown(event) {
-    let keyCode = event.which;
-    sceneManager.handleInput(keyCode, true);
-}
-
-function handleKeyUp(event) {
-    let keyCode = event.which;
-    sceneManager.handleInput(keyCode, false);
-}
- */
+});

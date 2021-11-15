@@ -25,7 +25,7 @@ function SceneManager(canvas) {
 
     function buildCamera({ width, height }) {
         const nearPlane = 0.1;
-        const farPlane = 1000;
+        const farPlane = 1500;
         const camera = new THREE.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, nearPlane, farPlane);
         camera.position.z = 800;
         return camera;
@@ -100,6 +100,7 @@ function SceneManager(canvas) {
     const dynamicSubjects = [];
     let enemyAmount = 50;
     let playerTouchInput = { x: 0, y: 0 };
+    let keyMap = [];
     let startTimer, timer;
 
     this.STATES = Object.freeze({
@@ -111,13 +112,13 @@ function SceneManager(canvas) {
 
     this.gameState = this.STATES.NEWGAME;
 
-    // let keyMap = [];
+    
 
     /* ----------------------------------------------- INPUT ------------------------------------------------ */
-    /*     this.handleInput = function (keyCode, isDown) {
+    this.handleKeyInput = function (keyCode, isDown) {
             keyMap[keyCode] = isDown;
         }
-     */
+
     this.handleInput = (touchStart, touchMove) => {
         playerTouchInput.x = touchMove.x - touchStart.x;
         playerTouchInput.y = touchMove.y - touchStart.y;
@@ -149,7 +150,7 @@ function SceneManager(canvas) {
                 dynamicSubjects.forEach(child => {
                     if (child instanceof Enemy) {
                         child.init();
-                        child.acquirePlayerPos(P1.getPosition());
+                        child.targetPlayer(P1.getPosition());
                     }
                 })
 
@@ -163,7 +164,7 @@ function SceneManager(canvas) {
             dynamicSubjects.forEach(child => {
                 if (child instanceof Enemy) {
                     child.init();
-                    child.acquirePlayerPos(P1.getPosition());
+                    child.targetPlayer(P1.getPosition());
                 }
             })
 
@@ -219,7 +220,7 @@ function SceneManager(canvas) {
             }
         })
 
-        // P1.handleInput(keyMap, camera);
+        P1.handleKeyInput(keyMap, camera);
         P1.handleInput(playerTouchInput, camera);
 
 
